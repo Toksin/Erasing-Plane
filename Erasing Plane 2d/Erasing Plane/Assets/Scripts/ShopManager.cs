@@ -37,9 +37,8 @@ public class ShopManager : MonoBehaviour
         {
             int index = i;
             skinButtons[i].onClick.AddListener(() => 
-            {
-                
-                BuySkin(index);
+            {                
+                BuySkin(index);               
             });
             useSkinButtons[i].onClick.AddListener(() => 
             {
@@ -51,13 +50,12 @@ public class ShopManager : MonoBehaviour
         for (int i = 0; i < backgroundButtons.Length; i++)
         {
             int index = i;
-            backgroundButtons[i].onClick.AddListener(() => {
-                
-                BuyBackground(index);
+            backgroundButtons[i].onClick.AddListener(() => 
+            {                
+                BuyBackground(index);                
             });
-            useBackgroundButtons[i].onClick.AddListener(() => {
-
-                
+            useBackgroundButtons[i].onClick.AddListener(() => 
+            {                
                 UseBackground(index);
             });
         }
@@ -70,24 +68,29 @@ public class ShopManager : MonoBehaviour
                 BuyMusic(index);
             });
         }
-    }    
+    }
     public void UpdateShopUI()
-    {       
+    {
         for (int i = 0; i < skinButtons.Length; i++)
         {
-            skinButtons[i].interactable = !gameData.skinsUnlocked[i] && gameData.totalCoins >= skinPrices[i];
-            useSkinButtons[i].interactable = gameData.skinsUnlocked[i]; 
+            // Если скин не разблокирован и хватает монет, активируем кнопку, иначе деактивируем
+            skinButtons[i].gameObject.SetActive(!gameData.skinsUnlocked[i]);
+            // Кнопка использования активна только если скин разблокирован
+            useSkinButtons[i].gameObject.SetActive(gameData.skinsUnlocked[i]);
         }
 
         for (int i = 0; i < backgroundButtons.Length; i++)
         {
-            backgroundButtons[i].interactable = !gameData.backgroundUnlocked[i] && gameData.totalCoins >= backgroundPrices[i];
-            useBackgroundButtons[i].interactable = gameData.backgroundUnlocked[i]; 
+            // Если фон не разблокирован и хватает монет, активируем кнопку, иначе деактивируем
+            backgroundButtons[i].gameObject.SetActive(!gameData.backgroundUnlocked[i]);
+            // Кнопка использования фона активна только если фон разблокирован
+            useBackgroundButtons[i].gameObject.SetActive(gameData.backgroundUnlocked[i]);
         }
-    
+
         for (int i = 0; i < musicButtons.Length; i++)
         {
-            musicButtons[i].interactable = !gameData.musicUnlocked[i] && gameData.totalCoins >= musicPrices[i];
+            // Если музыка не разблокирована и хватает монет, активируем кнопку, иначе деактивируем
+            musicButtons[i].gameObject.SetActive(!gameData.musicUnlocked[i]);
         }
     }
     public void BuySkin(int index)
@@ -104,14 +107,14 @@ public class ShopManager : MonoBehaviour
             
             SaveSystem.Save(gameData);           
             UpdateShopUI();
+            gameObject.SetActive(false);
         }
         Debug.Log("OnClick done");
         onClick?.Invoke(this, EventArgs.Empty);
-        Debug.Log(gameData.totalCoins);
+        Debug.Log(gameData.totalCoins);       
     }
     public void BuyBackground(int index)
     {
-
         if (index < 0 || index >= backgroundPrices.Length) return;
 
         int price = backgroundPrices[index];
@@ -124,9 +127,10 @@ public class ShopManager : MonoBehaviour
           
             SaveSystem.Save(gameData);           
             UpdateShopUI();
+            gameObject.SetActive(false);
         }
 
-        onClick?.Invoke(this, EventArgs.Empty);
+        onClick?.Invoke(this, EventArgs.Empty);        
     }
     public void BuyMusic(int index)
     {
@@ -144,7 +148,7 @@ public class ShopManager : MonoBehaviour
            
         }
         onClick?.Invoke(this, EventArgs.Empty);
-        ChangeMusic.Instance.UpdateMusicDropdown();
+        ChangeMusic.Instance.UpdateMusicDropdown();       
     }
     public void UseSkin(int index)
     {

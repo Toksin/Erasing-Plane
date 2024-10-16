@@ -177,7 +177,7 @@ public class GameStates : MonoBehaviour
 
         if (currentMaterial.materialType == MaterialSelection.MaterialType.Empty)
         {
-            info = "0 materials";
+            info = "Materials 0";
         }
         else
         {

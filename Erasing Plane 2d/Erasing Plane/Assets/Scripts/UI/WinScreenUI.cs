@@ -36,7 +36,7 @@ public class WinScreenUI : MonoBehaviour
     }
     private void Update()
     {
-        coinAmount.text = GameStates.Instance.GetTemporaryCoins().ToString();
+        coinAmount.text = "Total coins: " + GameStates.Instance.GetTemporaryCoins().ToString();
         materialsAmount.text = GameStates.Instance.GetCollectedMaterialsInfo().ToString();
         
     }

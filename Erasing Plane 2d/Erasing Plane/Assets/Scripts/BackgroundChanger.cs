@@ -6,7 +6,10 @@ public class BackgroundChanger : MonoBehaviour
 {
     public static BackgroundChanger instance;
 
-    public GameObject[] backgrounds; 
+    public GameObject[] backgrounds;
+
+    [SerializeField] private Color[] backgroundColors;
+    [SerializeField] private Camera mainCamera;
 
     private void Awake()
     {

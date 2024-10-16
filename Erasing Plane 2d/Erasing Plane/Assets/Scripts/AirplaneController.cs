@@ -37,7 +37,8 @@ public class AirplaneController : MonoBehaviour
     private bool isRotatingRight = false; 
     private bool isBoosting = false;
 
-    public GameObject[] playerSkins; 
+    public GameObject[] playerSkins;
+    [SerializeField] private float[] boostPowers;
     private int activeSkinIndex;
 
     private Vector2 launchDirection;
@@ -70,12 +71,13 @@ public class AirplaneController : MonoBehaviour
 
         for (int i = 0; i < playerSkins.Length; i++)
         {
-            playerSkins[i].SetActive(i == index); 
+            playerSkins[i].SetActive(i == index);
         }
 
         activeSkinIndex = index;
-        Debug.Log($"Skin {index} is now active.");
-    }
+        boostPower = boostPowers[activeSkinIndex]; // Устанавливаем значение boostPower для текущего скина
+        Debug.Log($"Skin {index} is now active with boostPower = {boostPower}");
+    }   
 
     void Update()
     {
