@@ -61,9 +61,9 @@ public class IslandUpgradeManager : MonoBehaviour
     {        
         islandLevelText.text = "Island level: " + gameData.islandLevel;
         upgradeCostText.text = "Need to upgrade:\n" +
-            "Bricks: " + gameData.requiredBricks + "\n" +
-            "Wood: " + gameData.requiredWood + "\n" +
-            "Concrete: " + gameData.requiredConcrete;
+            ": " + gameData.requiredBricks + "\n" +
+            ": " + gameData.requiredWood + "\n" +
+            ": " + gameData.requiredConcrete;
     }
 
     private IEnumerator GeneratePassiveIncome()

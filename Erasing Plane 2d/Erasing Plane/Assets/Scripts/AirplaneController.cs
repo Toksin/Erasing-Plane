@@ -1,9 +1,5 @@
-using System;
+п»їusing System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Reflection;
-using Unity.VisualScripting;
-using Unity.VisualScripting.Antlr3.Runtime.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -11,11 +7,11 @@ using UnityEngine.UI;
 public class AirplaneController : MonoBehaviour
 {
     public static AirplaneController Instance { get; private set; }
-    public LineRenderer trajectoryLine; 
+    public LineRenderer trajectoryLine;
     public Rigidbody2D rb;
 
     public event EventHandler onAirplanePush;
-    
+
     [SerializeField] private float maxStretch = 3.0f;
     [SerializeField] private float launchPower = 4f;
     [SerializeField] private float friction = 0.99f;
@@ -26,15 +22,16 @@ public class AirplaneController : MonoBehaviour
     [SerializeField] private Button leftButton;
     [SerializeField] private Button boostButton;
     [SerializeField] private Button rightButton;
+    [SerializeField] private Button startButton;
 
-    public MaterialSelection.MaterialData currentMaterial; 
+    public MaterialSelection.MaterialData currentMaterial;
 
-    private Vector2 initialTouchPosition; 
-    [SerializeField] private bool isDragging = false; 
-    private bool isLaunched = false; 
-    private bool canInteract = true; 
-    private bool isRotatingLeft = false; 
-    private bool isRotatingRight = false; 
+    private Vector2 initialTouchPosition;
+    [SerializeField] private bool isDragging = false;
+    private bool isLaunched = false;
+    private bool canInteract = true;
+    private bool isRotatingLeft = false;
+    private bool isRotatingRight = false;
     private bool isBoosting = false;
 
     public GameObject[] playerSkins;
@@ -50,16 +47,18 @@ public class AirplaneController : MonoBehaviour
     }
 
     void Start()
-    {        
+    {
         rb.gravityScale = 0f;
-      
+
         AddButtonListeners(leftButton, PointerDownLeft, PointerUpLeft);
         AddButtonListeners(boostButton, PointerDownBoost, PointerUpBoost);
         AddButtonListeners(rightButton, PointerDownRight, PointerUpRight);
 
         activeSkinIndex = SaveSystem.Load().activeSkinIndex;
-        SetActiveSkin(activeSkinIndex);
+        SetActiveSkin(activeSkinIndex);      
     }
+
+  
 
     private void SetActiveSkin(int index)
     {
@@ -75,21 +74,21 @@ public class AirplaneController : MonoBehaviour
         }
 
         activeSkinIndex = index;
-        boostPower = boostPowers[activeSkinIndex]; // Устанавливаем значение boostPower для текущего скина
+        boostPower = boostPowers[activeSkinIndex]; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ boostPower пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
         Debug.Log($"Skin {index} is now active with boostPower = {boostPower}");
-    }   
+    }
 
     void Update()
     {
         if (canInteract)
-        {            
+        {
             if (Input.touchCount > 0)
             {
                 HandleTouchInput();
             }
 
-            
-            if (Input.GetMouseButtonDown(0)) 
+
+            if (Input.GetMouseButtonDown(0))
             {
                 Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                 RaycastHit2D hit = Physics2D.Raycast(mousePosition, Vector2.zero);
@@ -100,7 +99,7 @@ public class AirplaneController : MonoBehaviour
                 }
             }
 
-            if (isDragging && Input.GetMouseButton(0)) 
+            if (isDragging && Input.GetMouseButton(0))
             {
                 Vector2 currentMousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                 Vector2 stretchVector = initialTouchPosition - currentMousePosition;
@@ -116,7 +115,7 @@ public class AirplaneController : MonoBehaviour
                 transform.rotation = Quaternion.Euler(0, 0, angle);
             }
 
-            if (isDragging && Input.GetMouseButtonUp(0)) 
+            if (isDragging && Input.GetMouseButtonUp(0))
             {
                 isDragging = false;
                 LaunchObject(initialTouchPosition - (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition));
@@ -146,61 +145,73 @@ public class AirplaneController : MonoBehaviour
 
     private void HandleTouchInput()
     {
-        Touch touch = Input.GetTouch(0);
-        Vector2 touchPosition = Camera.main.ScreenToWorldPoint(touch.position);
-
-        if (touch.phase == TouchPhase.Began)
-        {
-            RaycastHit2D hit = Physics2D.Raycast(touchPosition, Vector2.zero);
-            if (hit.collider != null && hit.collider.gameObject == gameObject)
+       
+            if (Input.touchCount == 0)
             {
-                isDragging = true;
-                initialTouchPosition = touchPosition;
-            }
-        }
-
-        if (isDragging && (touch.phase == TouchPhase.Moved || touch.phase == TouchPhase.Stationary))
-        {
-            Vector2 currentTouchPosition = Camera.main.ScreenToWorldPoint(touch.position);
-            Vector2 stretchVector = initialTouchPosition - currentTouchPosition;
-
-            if (stretchVector.magnitude > maxStretch)
-            {
-                stretchVector = stretchVector.normalized * maxStretch;
+                return;
             }
 
-            DrawTrajectory(stretchVector);
+            Touch touch = Input.GetTouch(0);
+            Vector2 touchPosition = Camera.main.ScreenToWorldPoint(touch.position);
 
-            float angle = Mathf.Atan2(stretchVector.y, stretchVector.x) * Mathf.Rad2Deg;
-            transform.rotation = Quaternion.Euler(0, 0, angle);
-        }
+            if (touch.phase == TouchPhase.Began)
+            {
+                RaycastHit2D hit = Physics2D.Raycast(touchPosition, Vector2.zero);
+                if (hit.collider != null && hit.collider.gameObject == gameObject)
+                {
+                    isDragging = true;
+                    initialTouchPosition = touchPosition;
+                }
+            }
 
-        if (touch.phase == TouchPhase.Ended)
-        {
-            isDragging = false;
-            LaunchObject(initialTouchPosition - (Vector2)Camera.main.ScreenToWorldPoint(touch.position));
-        }
+            if (isDragging && (touch.phase == TouchPhase.Moved || touch.phase == TouchPhase.Stationary))
+            {
+                Vector2 currentTouchPosition = Camera.main.ScreenToWorldPoint(touch.position);
+                Vector2 stretchVector = initialTouchPosition - currentTouchPosition;
+
+                if (stretchVector.magnitude > maxStretch)
+                {
+                    stretchVector = stretchVector.normalized * maxStretch;
+                }
+
+                DrawTrajectory(stretchVector);
+
+                float angle = Mathf.Atan2(stretchVector.y, stretchVector.x) * Mathf.Rad2Deg;
+                transform.rotation = Quaternion.Euler(0, 0, angle);
+            }
+
+            if (isDragging && touch.phase == TouchPhase.Ended)
+            {
+                isDragging = false;
+                Vector2 stretchVector = initialTouchPosition - (Vector2)Camera.main.ScreenToWorldPoint(touch.position);
+
+                if (stretchVector.magnitude > 0)
+                {
+                    LaunchObject(stretchVector);
+                }
+            }
+        
     }
 
     private void LaunchObject(Vector2 stretchVector)
-    {       
+    {
         launchDirection = stretchVector.normalized;
         launchStrength = stretchVector.magnitude * launchPower;
 
-        
+
         rb.velocity = launchDirection * launchStrength;
 
         ClearTrajectory();
-       
+
         isLaunched = true;
         canInteract = false;
         onAirplanePush?.Invoke(this, EventArgs.Empty);
     }
 
     private void ReduceSpeedOverTime()
-    {        
+    {
         rb.velocity *= friction;
-       
+
         if (rb.velocity.magnitude < minSpeed)
         {
             rb.velocity = rb.velocity.normalized * minSpeed;
@@ -208,17 +219,17 @@ public class AirplaneController : MonoBehaviour
     }
 
     private void DrawTrajectory(Vector2 stretchVector)
-    {       
+    {
         trajectoryLine.positionCount = 2;
-        trajectoryLine.SetPosition(0, transform.position); 
-        trajectoryLine.SetPosition(1, (Vector2)transform.position + stretchVector); 
+        trajectoryLine.SetPosition(0, transform.position);
+        trajectoryLine.SetPosition(1, (Vector2)transform.position + stretchVector);
     }
 
     private void ClearTrajectory()
-    {       
+    {
         trajectoryLine.positionCount = 0;
     }
-  
+
     private void RotateLeft()
     {
         if (isLaunched)
@@ -227,7 +238,7 @@ public class AirplaneController : MonoBehaviour
             UpdateVelocity();
         }
     }
-   
+
     private void RotateRight()
     {
         if (isLaunched)
@@ -235,21 +246,21 @@ public class AirplaneController : MonoBehaviour
             transform.Rotate(-Vector3.forward * rotationSpeed * Time.deltaTime);
             UpdateVelocity();
         }
-    }   
+    }
     private void Boost()
     {
         if (isLaunched)
         {
             rb.velocity += (Vector2)transform.right * boostPower * Time.deltaTime;
         }
-    }   
+    }
     private void UpdateVelocity()
     {
         if (rb.velocity.magnitude > 0)
         {
             rb.velocity = Quaternion.Euler(0, 0, transform.eulerAngles.z) * Vector2.right * rb.velocity.magnitude;
         }
-    }    
+    }
     private void AddButtonListeners(Button button, Action onPointerDown, Action onPointerUp)
     {
         EventTrigger trigger = button.gameObject.AddComponent<EventTrigger>();
@@ -261,7 +272,7 @@ public class AirplaneController : MonoBehaviour
         EventTrigger.Entry entryUp = new EventTrigger.Entry { eventID = EventTriggerType.PointerUp };
         entryUp.callback.AddListener((data) => { onPointerUp(); });
         trigger.triggers.Add(entryUp);
-    }    
+    }
     private void PointerDownLeft() { isRotatingLeft = true; }
     private void PointerUpLeft() { isRotatingLeft = false; }
 
@@ -270,7 +281,7 @@ public class AirplaneController : MonoBehaviour
 
     private void PointerDownBoost() { isBoosting = true; }
     private void PointerUpBoost() { isBoosting = false; }
-   
+
     public void SetMaterial(MaterialSelection.MaterialData material)
     {
         currentMaterial = material;
@@ -280,13 +291,13 @@ public class AirplaneController : MonoBehaviour
 
     private void AdjustSpeedBasedOnMaterial()
     {
-        if (currentMaterial.materialType.IsUnityNull())
-        {            
+        if (currentMaterial.materialType == null)
+        {
             return;
-        }    
-       
-        float emptyMaterialLaunchPower = 4f; 
-        float emptyMaterialFriction = 0.99f; 
+        }
+
+        float emptyMaterialLaunchPower = 4f;
+        float emptyMaterialFriction = 0.99f;
 
         if (currentMaterial.materialType.Equals("Empty"))
         {
@@ -297,10 +308,10 @@ public class AirplaneController : MonoBehaviour
         {
             launchPower = 4f / currentMaterial.weight;
             friction = 0.99f / currentMaterial.weight;
-        }      
+        }
 
         Debug.Log($"Material Changed: launchPower = {launchPower}, friction = {friction}");
     }
 
-   
+
 }

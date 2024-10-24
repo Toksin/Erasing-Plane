@@ -94,6 +94,14 @@ public  class SoundManager : MonoBehaviour
 
         if (IslandUpgradeManager.Instance != null)
             IslandUpgradeManager.Instance.onClick += IslandUpgradeManager_onClick;
+
+        if (ChangeMenu.Instance != null)
+            ChangeMenu.Instance.onClick += ChangeMenu_onClick;
+    }
+
+    private void ChangeMenu_onClick(object sender, System.EventArgs e)
+    {
+        PlaySound(AudioClipRefsSO.click, mainCamera.transform.position);
     }
 
     private void ShopManager_onClickUse(object sender, System.EventArgs e)
